@@ -7,11 +7,13 @@ var dbUri = process.env.MONGODB_URI ||
 if (!process.env.MONGODB_URI) {
   // check that MongoD is running...
   require('net').connect(27017, 'localhost').on('error', function() {
-    console.log("YOU MUST BOW BEFORE THE MONGOD FIRST, MORTAL!");
+    console.log('YOU MUST BOW BEFORE THE MONGOD FIRST, MORTAL!');
     process.exit(0);
   });
 }
 
-mongoose.connect(dbUri);
+mongoose.connect(dbUri, {
+  useMongoClient: true
+});
 
 module.exports = mongoose;
