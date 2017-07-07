@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
+var api = require('./routes/api');
 
 var app = express();
 
@@ -22,8 +22,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Validate content-type.
+app.use(validateContentType);
+
+// Mount routes
 app.use('/', index);
-app.use('/users', users);
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -40,7 +44,24 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({
+    message: err.message,
+    error: res.locals.error
+  });
 });
+
+function validateContentType(req, res, next) {
+  var methods = ['PUT', 'PATCH', 'POST'];
+  if (                                    // If the request is
+    methods.indexOf(req.method) !== -1 && // one of PUT, PATCH or POST, and
+    Object.keys(req.body).length !== 0 && // has a body that is not empty, and
+    !req.is('json')                       // does not have an application/json
+  ) {                                     // Content-Type header, then …
+    var message = 'Content-Type header must be application/json.';
+    res.status(400).json(message);
+  } else {
+    next();
+  }
+}
 
 module.exports = app;
