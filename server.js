@@ -10,6 +10,12 @@ var api = require('./routes/api');
 
 var app = express();
 
+// load the env vars
+require('dotenv').load();
+
+// connect to the MongoDB with mongoose
+require('./config/database');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
